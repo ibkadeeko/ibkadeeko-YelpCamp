@@ -1,0 +1,13 @@
+.form {
+    width: 30%;
+    margin: 3em auto 0;
+}
+
+.form input {
+    margin-bottom: 1em;
+}
+
+.form button {
+    margin-bottom: 1em;
+}
+
