@@ -1,61 +1,99 @@
-// Base js code for my Yelp Camp
+/*
+    HOW RESTFUL ROUTES WORK
+    Using for example a dog app 
+    =======================================================
+    NAME        URL         VERB    DESCRIPTION
+    =======================================================
+    INDEX       /dogs       GET     Display a list of all dogs
+    NEW         /dogs/new   GET     Display a form to add a new dog to list
+    CREATE      /dogs       POST    Add new dog to database
+    SHOW        /dogs/:id   GET     Shows more info about one dog on the list 
 
-// Modules
-const express = require('express');
-const bodyParser = require('body-parser');
+*/
 
-// Run Express App
-const app = express();
+// Import Modules
+const express       = require('express'),
+      bodyParser    = require('body-parser'),
+      mongoose      = require('mongoose');
 
-//Connect to ejs
-app.set('view engine', 'ejs');
-//Connect to style sheet and other assets
-app.use(express.static('public'));
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true }));
+// Setup Express App
+const app = express();      // Run Express App
+app.set('view engine', 'ejs');      //Connect to ejs
+app.use(express.static('public'));      //Connect to style sheet and other assets
+app.use(bodyParser.urlencoded({ extended: true }));     // parse application/x-www-form-urlencoded
 
-//Camp DataBase
-let campgrounds = [
-    {name: 'Salmon Creek', image: 'https://farm1.staticflickr.com/68/180073544_af9816aeff.jpg'},
-    {name: 'Guzape Valley', image: 'https://farm8.staticflickr.com/7268/7121859753_e7f787dc42.jpg'},
-    {name: 'Kubwa Reserves', image: 'https://farm9.staticflickr.com/8671/16642502436_e6d611bcb5.jpg'},
-    {name: 'Salmon Creek', image: 'https://farm1.staticflickr.com/68/180073544_af9816aeff.jpg'},
-    {name: 'Guzape Valley', image: 'https://farm8.staticflickr.com/7268/7121859753_e7f787dc42.jpg'},
-    {name: 'Kubwa Reserves', image: 'https://farm9.staticflickr.com/8671/16642502436_e6d611bcb5.jpg'},
-    {name: 'Salmon Creek', image: 'https://farm1.staticflickr.com/68/180073544_af9816aeff.jpg'},
-    {name: 'Guzape Valley', image: 'https://farm8.staticflickr.com/7268/7121859753_e7f787dc42.jpg'},
-    {name: 'Kubwa Reserves', image: 'https://farm9.staticflickr.com/8671/16642502436_e6d611bcb5.jpg'}
-];
+//Set up default mongoose connection 
+var mongoDB = 'mongodb://localhost/yelpCamp';
+mongoose.connect(mongoDB, { useNewUrlParser: true });
+mongoose.Promise = global.Promise;
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+
+// MongoDB Schema SETUP
+const campgroundSchema = new mongoose.Schema({
+    name: String,
+    image: String,
+    description: String
+});
+const Campground = mongoose.model("Campground", campgroundSchema);
 
 /*
 *    ROUTES
 */
+
 app.get('/', (req,res) => {
     res.render('home');
 });
 
+// INDEX - Display Campgrounds
 app.get('/campgrounds', (req, res) => {
-    res.render('campgrounds', {campgrounds: campgrounds});
+    Campground.find({}, (err, campgrounds) => {
+        if (err) {
+            console.log(err);
+        } else {
+            res.render('index', {campgrounds: campgrounds});
+        }
+    });
 });
 
-//to follow the restful convention the post request must be the same with the get 
+// CREATE - Create new campground
 app.post('/campgrounds', (req, res) => {
     // Save input from form
     let name = req.body.name;
     let image = req.body.image;
-    let newCampground = {name: name, image: image};
+    let description = req.body.description;
+    let newCampground = {name: name, image: image, description: description};
     //Add new Camp ground details to database
-    campgrounds.push(newCampground);
-    //Redirect back to campgrounds page
-    res.redirect('/campgrounds');
+    Campground.create(newCampground, (err, newlyCreated) => {
+        if (err) {
+            console.log(err);
+        } else {
+           //Redirect back to campgrounds page
+            res.redirect('/campgrounds');
+        }
+    });
 });
-//restful convention
+
+// NEW - Display form to create new campground
 app.get('/campgrounds/new', (req, res) => {
-    res.render('new.ejs');
+    res.render('new');
+});
+
+//SHOW - display more information on one campground
+app.get('/campgrounds/:id', (req, res) => {
+    //find the campground with the designated ID
+    Campground.findById(req.params.id, (err, foundCampground) => {
+        if (err) {
+            console.log(err);
+        } else {
+            //Display the campground
+            // console.log(foundCampground);
+            res.render('show', {campground: foundCampground});
+        }
+    });
 });
 
 // Listening Server
-const port = 8181;
-app.listen(port, () => {
+app.listen(8181, () => {
     console.log('Yelp Camp Server has started on http://localhost:8181');
 });
