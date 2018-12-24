@@ -7,9 +7,9 @@
 
         <div class="form">
             <form action="/campgrounds" method="POST">
-                <input class="form-control" type="text" name="name" placeholder="Camp Name" required>
-                <input class="form-control" type="text" name="image" placeholder="image URL" required>
-                <textarea class="form-control" id="description" name="description" rows="4" placeholder="Enter Short Description of Camp site here."></textarea>
+                <input class="form-control" type="text" name="campground[name]" placeholder="Camp Name" required>
+                <input class="form-control" type="text" name="campground[image]" placeholder="image URL" required>
+                <textarea class="form-control" id="description" name="campground[description]" rows="4" placeholder="Enter Short Description of Camp site here."></textarea>
                 <button class="btn btn-large btn-primary btn-block">Submit</button>
             </form>
             
