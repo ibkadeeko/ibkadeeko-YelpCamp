@@ -17,3 +17,23 @@
     margin-bottom: 1em;
 }
 
+.thumbnail img {
+    width: 100%;
+}
+
+.thumbnail {
+    padding: 0;
+}
+
+.card-title {
+    font-weight: 600;
+}
+
+.card-text {
+    text-align: justify;
+}
+
+.thumbnail .caption-full {
+    padding: 10px;
+}
+
