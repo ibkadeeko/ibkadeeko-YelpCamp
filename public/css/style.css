@@ -1,3 +1,7 @@
+body{
+    font-size: 16px;
+}
+
 .form {
     width: 30%;
     margin: 3em auto 0;
@@ -37,3 +41,10 @@
     padding: 10px;
 }
 
+.author {
+    text-align: left;
+}
+
+.author-name {
+    text-transform: capitalize;
+}
